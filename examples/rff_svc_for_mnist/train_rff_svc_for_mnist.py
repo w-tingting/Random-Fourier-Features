@@ -4,7 +4,7 @@
 # SVM classifier using RFF. Interface of RFFSVC is quite close to sklearn.svm.SVC.
 #
 # Author: Tetsuya Ishikawa <tiskw111@gmail.com>
-# Date  : February 08, 2020
+# Date  : February 19, 2020
 ##################################################### SOURCE START #####################################################
 
 """
@@ -14,12 +14,14 @@ Overview:
 
 Usage:
     main_rff_svc_for_mnist.py kernel [--input <str>] [--output <str>] [--pcadim <int>] [--kernel <str>] [--gamma <float>] [--C <float>] [--seed <int>]
-    main_rff_svc_for_mnist.py rff [--input <str>] [--output <str>] [--pcadim <int>] [--kdim <int>] [--stdev <float>] [--seed <int>]
+    main_rff_svc_for_mnist.py rff [--input <str>] [--output <str>] [--pcadim <int>] [--kdim <int>] [--stdev <float>] [--seed <int>] [--cpus <int>]
+    main_rff_svc_for_mnist.py orf [--input <str>] [--output <str>] [--pcadim <int>] [--kdim <int>] [--stdev <float>] [--seed <int>] [--cpus <int>]
     main_rff_svc_for_mnist.py -h|--help
 
 Options:
     kernel           Run kernel SVM classifier.
     rff              Run RFF SVM classifier.
+    orf              Run ORF SVM classifier.
     --input <str>    Directory path to the MNIST dataset.                [default: ../../dataset/mnist]
     --output <str>   File path to the output pickle file.                [default: result.pickle]
     --pcadim <int>   Output dimention of Principal Component Analysis.   [default: 256]
@@ -29,6 +31,7 @@ Options:
     --kdim <int>     Hyper parameter of RFF SVM (dimention of RFF)       [default: 1024]
     --stdev <float>  Hyper parameter of RFF SVM (stdev of RFF)           [default: 0.05]
     --seed <int>     Random seed.                                        [default: 111]
+    --cpus <int>     Number of available CPUs.                           [default: -1]
     -h, --help       Show this message.
 """
 
@@ -98,7 +101,8 @@ def main(args):
 
     ### Create classifier instance.
     if   args["kernel"]: svc = skl.svm.SVC(kernel = args["--kernel"], gamma = args["--gamma"])
-    elif args["rff"]   : svc = pyrff.RFFSVC(dim_output = args["--kdim"], std = args["--stdev"], tol = 1.0E-3)
+    elif args["rff"]   : svc = pyrff.RFFSVC(dim_output = args["--kdim"], std = args["--stdev"], tol = 1.0E-3, n_jobs = args["--cpus"])
+    elif args["orf"]   : svc = pyrff.ORFSVC(dim_output = args["--kdim"], std = args["--stdev"], tol = 1.0E-3, n_jobs = args["--cpus"])
     else               : exit("Error: First argument must be 'kernel' or 'rff'.")
 
     ### Load training data.
